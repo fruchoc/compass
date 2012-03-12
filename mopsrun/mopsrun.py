@@ -4,6 +4,7 @@
 import ensemble
 import trajectory
 import postproc_particles
+import postproc_plotting
 
 # Class which contains all information pertaining to a particular MOPS output run
 class MopsRun:
@@ -106,11 +107,34 @@ class MopsRun:
             for fname in self.listChem:
                 self.allgasphase = trajectory.ChemProfile(fname)
         
-        # Create a PSD
-        en1 = self.ensembles[0]
-        diam = en1.getParameterList(3)
-        wt   = en1.getParameterList(0)
+        # GET THE PSD PLOTS
+        stats = []
+        names = []
+        for en in self.ensembles:
+            stats.append(postproc_particles.KernelDensity(en.getParameterList(2), en.getParameterList(0)))
+            names.append(en.name)
         
-        stats = postproc_particles.KernelDensity(diam, wt)
-        stats.getCumulativePSD()
-        stats.printPSDStats()
+        meshes = []
+        frequencies = []
+        for s in stats:
+            psd = s.returnPSD()
+            meshes.append(psd[0])
+            frequencies.append(psd[1])
+        
+        #psdplot = postproc_plotting.Plotting()
+        #psdplot.plotPSDs(meshes, frequencies, names)
+        
+        # GET THE RATES PLOT
+        ratesplot = postproc_plotting.Plotting()
+        
+        times = []
+        values = []
+        rnames = []
+        runits = []
+        for rate in self.allrates.trajectories:
+            times.append(rate.getTimes())
+            values.append(rate.getValues())
+            rnames.append(rate.getName())
+            runits.append(rate.getUnit())
+        
+        ratesplot.plotTrajectoryCIs(times, values, rnames, runits)

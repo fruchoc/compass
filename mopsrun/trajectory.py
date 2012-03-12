@@ -19,10 +19,10 @@ class Trajectory:
         self.getConfIntervals()
     
     def getName(self):
-        return name[0]
+        return self.name[0]
     
     def getUnit(self):
-        return name[1]
+        return self.name[1]
     
     # Generates the upper and lower confidence intervals
     def getConfIntervals(self):
@@ -39,11 +39,23 @@ class Trajectory:
         for t, v, e in zip(self.times, self.values, self.errors):
             print("{0:.3e}\t{1:.3e}\t{2:.3e}".format(t, v, e))
     
+    # Return the times vector
+    def getTimes(self):
+        return self.times
+    
     # Return the values vector of a trajectory
     def getValues(self):
         return self.values
     
-    # Return the erros vector
+    # Return the upper CI
+    def getUpperCI(self):
+        return self.upper_ci
+    
+    # Return the lower CI
+    def getLowerCI(self):
+        return self.lower_ci
+    
+    # Return the errors vector
     def getError(self):
         return self.errors
 

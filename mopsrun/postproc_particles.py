@@ -1,7 +1,7 @@
+# postproc_particles.py: (c) William Menz (wjm34) 2012
 
 # Global imports
 import math
-import ensemble
 import re
 
 # Declare constants
@@ -38,9 +38,9 @@ class KernelDensity(EnsembleStats):
         self.mesh = self.makeMesh(self.num_points, self.lowerbound, self.upperbound)
         
         # Create the PSD
-        self.psd  = self.getPSD(self.diameters, self.weights)
-        self.cumulative_psd = self.getCumulativePSD()
-        self.getPSDStats()
+        self.psd  = self.calculatePSD(self.diameters, self.weights)
+        self.cumulative_psd = self.calculateCumulativePSD()
+        self.calculatePSDStats()
         
 
     # Set the lower bound of the estimated PSD
@@ -53,7 +53,7 @@ class KernelDensity(EnsembleStats):
     
     # Get the kernel density estimated PSD
     # returns a list of mesh diameters and frequency values [[dmesh], [freq]]
-    def getPSD(self, diameters, weights):
+    def calculatePSD(self, diameters, weights):
         
         psd = []
         
@@ -98,7 +98,7 @@ class KernelDensity(EnsembleStats):
         return [self.mesh, self.psd]
     
     # Generate the cumulative kernel density function
-    def getCumulativePSD(self):
+    def calculateCumulativePSD(self):
         
         # Check that the PSD has already been generated
         if len(self.psd) < 4:
@@ -106,26 +106,26 @@ class KernelDensity(EnsembleStats):
         
         # Calculate the CDF
         cdf = [self.psd[0]]
-        sum = 0
+        asum = 0
         
         i = 1
         while i < len(self.psd):
             # Calculate integral element
             dx = 0.5*(self.mesh[i]-self.mesh[i-1])*(self.psd[i]+self.psd[i-1])
             cdf.append(dx + cdf[i-1])
-            sum += dx
+            asum += dx
             i += 1
         
-        self.psd_area = sum
+        self.psd_area = asum
         
         return cdf
     
     # Generate statistics about this PSD
     # e.g. d10, d50, dmode, d90 etc
-    def getPSDStats(self):
+    def calculatePSDStats(self):
         
-        # Get the cumulative PSD
-        self.cumulative_psd = self.getCumulativePSD()
+        if (not hasattr(self, 'cumulative_psd')):
+            self.cumulative_psd = self.calculateCumulativePSD()
         
         # Get the d10/d50/d90
         self.d10 = self.findPoint(0.1)
@@ -170,13 +170,13 @@ class KernelDensity(EnsembleStats):
     # Get the mode of the PSD
     def getMode(self):
         
-        max = 0
+        dmax = 0
         imax = 0
         i = 0
         while i < len(self.psd):
             
-            if self.psd[i] > max:
-                max = self.psd[i]
+            if self.psd[i] > dmax:
+                dmax = self.psd[i]
                 imax = i
             
             i += 1
