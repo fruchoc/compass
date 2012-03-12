@@ -3,6 +3,7 @@
 # Global imports
 import ensemble
 import trajectory
+import postproc_particles
 
 # Class which contains all information pertaining to a particular MOPS output run
 class MopsRun:
@@ -107,3 +108,7 @@ class MopsRun:
         
         # Create a PSD
         en1 = self.ensembles[0]
+        diam = en1.getParameterList(3)
+        wt   = en1.getParameterList(0)
+        
+        stats = postproc_particles.KernelDensity(diam, wt)

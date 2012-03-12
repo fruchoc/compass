@@ -119,3 +119,4 @@ class DiamType:
     col = 1
     pri = 2
     sph = 3
+    mob = 4
