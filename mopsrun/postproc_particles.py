@@ -39,6 +39,8 @@ class KernelDensity(EnsembleStats):
         
         # Create the PSD
         self.psd  = self.getPSD(self.diameters, self.weights)
+        self.cumulative_psd = self.getCumulativePSD()
+        self.getPSDStats()
         
 
     # Set the lower bound of the estimated PSD
@@ -65,7 +67,7 @@ class KernelDensity(EnsembleStats):
     def makeMesh(self, num_points, lb, ub):
         
         # Set the lower bound at zero if it's close
-        if lb < 0.1:
+        if lb < 1.0:
             lb = 0
         
         # Get the step size
@@ -130,10 +132,19 @@ class KernelDensity(EnsembleStats):
         self.d50 = self.findPoint(0.5)
         self.d90 = self.findPoint(0.9)
         self.dmode = self.getMode()
+    
+    # Print the statistics about this PSD to console.
+    def printPSDStats(self):
         
+        print("\tarea:\t{0:.4f}".format(self.psd_area))
+        print("\td10:\t{0:.2f} nm".format(self.d10))
+        print("\td50:\t{0:.2f} nm".format(self.d50))
+        print("\td90:\t{0:.2f} nm".format(self.d90))
+        print("\tmode:\t{0:.2f} nm".format(self.dmode))
+
         
     # Interpolate between points on the cumulative PSD curve
-    def interpolate(t, dl, du, kl, ku):
+    def interpolate(self, t, dl, du, kl, ku):
     
         dd = du - dl
         dk = ku - kl
@@ -143,32 +154,31 @@ class KernelDensity(EnsembleStats):
     
     # Given a cumulative density 't', return the value of the mesh
     def findPoint(self, t):
+        value = -1
         
         i = 0
         while i < len(self.cumulative_psd):
             
             if t == self.cumulative_psd[i]:
-                return self.mesh[i]
-            elif (self.psd[i-1] < t and self.psd[i] > t):
-                return self.interpolate(t, dmesh[i-1], dmesh[i], self.cumulative_psd[i-1], self.cumulative_psd[i])
-            else:
-                return -1
-            
+                value = self.mesh[i]
+            elif (self.cumulative_psd[i-1] < t and self.cumulative_psd[i] > t):
+                value = self.interpolate(t, self.mesh[i-1], self.mesh[i], self.cumulative_psd[i-1], self.cumulative_psd[i])
             i += 1
+        
+        return value
     
     # Get the mode of the PSD
     def getMode(self):
         
         max = 0
         imax = 0
-        
         i = 0
         while i < len(self.psd):
             
             if self.psd[i] > max:
-                max = self.psd
+                max = self.psd[i]
                 imax = i
             
             i += 1
         
-        return self.mesh[i]
+        return self.mesh[imax]

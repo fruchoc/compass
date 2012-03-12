@@ -112,3 +112,5 @@ class MopsRun:
         wt   = en1.getParameterList(0)
         
         stats = postproc_particles.KernelDensity(diam, wt)
+        stats.getCumulativePSD()
+        stats.printPSDStats()
