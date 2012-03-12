@@ -86,7 +86,7 @@ class Particle:
         
         if value < 0:
             print("compass: error, couldn't find {0}.".format(key))
-            sys.exit(5)
+            raise
         else:
             return value
 

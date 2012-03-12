@@ -3,11 +3,9 @@
 # Global imports
 import sys
 import getopt
-import os
 
 # Project-specific imports
 import mopsrun.mopsrun
-import mopsrun.mopsparser
 
 # Default initialisations
 auto = False
@@ -38,8 +36,8 @@ for opt, arg in opts:
         print("compass: searching for MOPS run")
         auto = True
     else:
-      usage()
-      sys.exit(2)
+        usage()
+        sys.exit(2)
 
 # Initialise a new MopsRun object
 mopsoutput = mopsrun.mopsrun.MopsRun()
