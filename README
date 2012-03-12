@@ -1,2 +1,12 @@
-COMPASS: A suite of postprocessors for dealing with MOPS output files.
+compass: A suite of postprocessors for dealing with MOPS output files.
 (c) William Menz (wjm34) 2012
+
+BRIEF INTRO:
+compass was written to assist with the postprocessing of CSV output files from
+MOPS calculations. It is a collection of modules, written in Python 2.7 which
+are capable of a diverse range of postprocessing, analysis and plotting tasks.
+
+SYSTEM REQUIREMENTS:
+Git
+Python 2.7, plus modules:
+  matplotlib
