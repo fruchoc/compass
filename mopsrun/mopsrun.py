@@ -15,13 +15,13 @@ class MopsRun:
         self.ensembles = []
         
         # Contains information of process rates
-        self.allrates = 0
+        self.allrates = []
         
         # Temporal evolution of particle properties
-        self.allpartproperties = 0
+        self.allpartproperties = []
         
         # Gas-phase rates
-        self.allgasphase = 0
+        self.allgasphase = []
        
         # Switches to indicate what data are present
         self.hasPsl = False
@@ -107,6 +107,15 @@ class MopsRun:
             for fname in self.listChem:
                 self.allgasphase = trajectory.ChemProfile(fname)
         
+        # Now let's do some plotting
+        self.plotAllPSDs()
+        self.plotAllRatesCI()
+    
+    
+    # Plots a PSD for every ensemble
+    def plotAllPSDs(self):
+        psdplot = postproc_plotting.Plotting()
+            
         # GET THE PSD PLOTS
         stats = []
         names = []
@@ -120,10 +129,11 @@ class MopsRun:
             psd = s.returnPSD()
             meshes.append(psd[0])
             frequencies.append(psd[1])
-        
-        #psdplot = postproc_plotting.Plotting()
-        #psdplot.plotPSDs(meshes, frequencies, names)
-        
+            
+        psdplot.plotPSDs(meshes, frequencies, names)
+    
+    # Plots the CIs for all rates
+    def plotAllRatesCI(self):
         # GET THE RATES PLOT
         ratesplot = postproc_plotting.Plotting()
         
