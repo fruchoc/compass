@@ -121,8 +121,8 @@ class MopsRun:
             meshes.append(psd[0])
             frequencies.append(psd[1])
         
-        #psdplot = postproc_plotting.Plotting()
-        #psdplot.plotPSDs(meshes, frequencies, names)
+        psdplot = postproc_plotting.Plotting()
+        psdplot.plotPSDs(meshes, frequencies, names)
         
         # GET THE RATES PLOT
         ratesplot = postproc_plotting.Plotting()
