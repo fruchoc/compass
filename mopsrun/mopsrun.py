@@ -78,10 +78,11 @@ class MopsRun:
     
     # Helper function to identify whether there is enough information to proceed with calculation
     def enoughInfo(self):
-        if (self.hasPsl and self.hasPart and self.hasRates and self.hasChem == False):
-            return False
-        else:
+        if (self.hasChem or self.hasPart or self.hasPsl or self.hasRates):
             return True
+        else:
+            return False
+
     
     # Load the CSV files into the MopsRun object
     def initialise(self):
@@ -111,7 +112,7 @@ class MopsRun:
         stats = []
         names = []
         for en in self.ensembles:
-            stats.append(postproc_particles.KernelDensity(en.getParameterList(2), en.getParameterList(0)))
+            stats.append(postproc_particles.KernelDensity(en.getParameterList(1), en.getParameterList(0)))
             names.append(en.name)
         
         meshes = []

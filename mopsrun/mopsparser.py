@@ -1,9 +1,7 @@
 # mopsparser.py: (c) William Menz (wjm34) 2012
 
 # Global imports
-import ensemble
 import trajectory
-import re
 
 class Parser:
     # Default constructor
@@ -14,7 +12,11 @@ class Parser:
     
     # Opens the CSV and returns the stream
     def openCSV(self):
-        self.istream = open(self.fname, "r")
+        try:
+            self.istream = open(self.fname, "r")
+        except:
+            print("compass: couldn't open file {0}.".format(self.fname))
+            raise
     
     # Closes the CSV
     def closeCSV(self):
@@ -37,6 +39,7 @@ class Parser:
                 cleanline.append(str(l.strip()))
             else:
                 print("compass: unrecognised data type")
+                raise
                 
         return cleanline
     
@@ -48,7 +51,7 @@ class Parser:
             unit = splitstring[1].split(')')[0]
             param = splitstring[0].strip()
         except:
-            print("compass: no unit found for parameter {0}".format(string))
+            #print("compass: no unit found for parameter {0}".format(string))
             param = string
             unit = "-"
         
