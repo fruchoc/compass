@@ -67,7 +67,10 @@ class Plotting:
             ratios = []
             i = 1
             while i < len(maxlist):
-                ratio = maxlist[i]/maxlist[i-1]
+                if maxlist[i-1] == 0.0:
+                    ratio = 1.0
+                else:
+                    ratio = maxlist[i]/maxlist[i-1]
                 if ratio < 1:
                     ratio = 1/ratio
                 ratios.append(math.log10(ratio))
@@ -85,8 +88,7 @@ class Plotting:
         # List holding lines
         lines = []
         
-        if not self.checkUnits(units):
-            print("compass: poor units specified for {0}".format)
+        self.checkUnits(units)
         
         # Plot the curves!
         for t, v, n in zip(times, values, names):
@@ -98,5 +100,12 @@ class Plotting:
     
     # Takes a list of trajectory names, checks for identical units    
     def checkUnits(self, units):
-        return True
+        i = 1
+        while i < len(units):
+            if units[i] != units[i-1]:
+                print("compass: poor units specified: {0} vs {1}.".format(units[i-1], units[i]))
+                return False
+            else:
+                return True
+            i += 1
     
