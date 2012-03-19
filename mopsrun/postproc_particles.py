@@ -9,8 +9,51 @@ PI = 3.141592653589793
 
 # Parent class for holding statistics of a given Ensemble
 class EnsembleStats:
-    def __init__(self):
-        print("test")
+    # Default constructor
+    def __init__(self, diameters, weights):
+        # Ensemble stats are initialised with diameters and weights.
+        
+        self.diameters = diameters
+        self.weights = weights
+    
+    # Generate general statistics about this PSD
+    def calculateEnsembleStats(self):
+        
+        self.damean = 0         # arithmetic mean
+        self.astdev = 0         # arithmetic stdev
+        self.dgmean = 1.0       # geometric mean
+        self.gstdev = 1.0       # geometric stdev
+        
+        # Check for diameters and weights
+        if (not (hasattr(self, 'diameters') and hasattr(self, 'weights'))):
+            print("compass: no diameters or weights found!")
+            raise
+        
+        asum = 0.0
+        gsum = 1.0
+        avar = 0.0
+        gvar = 1.0
+        
+        # Calculate scaling factor
+        p = (1.0/sum(self.weights))
+        
+        # First calculate the means...
+        for d, w in zip(self.diameters, self.weights):
+            asum += (d * w)
+            gsum += math.pow(d, w*p)
+        
+        self.damean = asum / sum(self.weights)
+        self.dgmean = gsum
+        
+        # Now use these to find the stdevs...
+        for d, w in zip(self.diameters, self.weights):
+            avar += w * math.pow(d - self.damean, 2.0)
+            gvar += w * math.pow(math.log(d) - math.log(self.dgmean), 2.0)
+        
+        self.astdev = math.sqrt(avar / sum(self.weights))
+        self.gstdev = math.exp(math.sqrt(gvar / sum(self.weights)))
+            
+        
 
 # The kernel density class is used for generating PSDs.
 # one set of diameters, weights can give one PSD.
@@ -34,6 +77,10 @@ class KernelDensity(EnsembleStats):
         self.lowerbound = (1 - self.bound_multiplier) * min(self.diameters)
         self.upperbound = (1 + self.bound_multiplier) * max(self.diameters)
         
+        # Calculate ensemble statistics
+        self.calculateEnsembleStats()
+        self.smoothing = self.getBandwidth()
+        
         # Make the mesh for the PSD
         self.mesh = self.makeMesh(self.num_points, self.lowerbound, self.upperbound)
         
@@ -50,6 +97,18 @@ class KernelDensity(EnsembleStats):
     # Set the upper bound of the estimated PSD
     def setUpperBound(self, upperbound):
         self.upperbound = upperbound
+    
+    # Use the 'normal distribution approximation' to estimate for Gaussian kernels
+    # http://en.wikipedia.org/wiki/Kernel_density_estimation
+    def getBandwidth(self):
+        if re.search(self.kerneltype, "Gaussian"):
+            # Check that ensemble stats have already been found.
+            if (not hasattr(self, 'astdev')):
+                self.calculateEnsembleStats()
+            
+            return (1.06 * self.astdev * pow(len(self.diameters), -(1.0/5.0)))
+        else:
+            return 1.0
     
     # Get the kernel density estimated PSD
     # returns a list of mesh diameters and frequency values [[dmesh], [freq]]
@@ -120,6 +179,7 @@ class KernelDensity(EnsembleStats):
         
         return cdf
     
+
     # Generate statistics about this PSD
     # e.g. d10, d50, dmode, d90 etc
     def calculatePSDStats(self):
