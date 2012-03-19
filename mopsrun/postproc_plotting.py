@@ -87,6 +87,7 @@ class Plotting:
         
         if not self.checkUnits(units):
             print("compass: poor units specified for {0}".format)
+        self.checkNumSeries(names)
         
         # Plot the curves!
         for t, v, n in zip(times, values, names):
@@ -95,6 +96,12 @@ class Plotting:
         plt.legend()
         
         plt.show()
+        
+    # Checks if there are too many series
+    def checkNumSeries(self, names):
+        if len(names) > 5:
+            print("compass: too many series!")
+            
     
     # Takes a list of trajectory names, checks for identical units    
     def checkUnits(self, units):
