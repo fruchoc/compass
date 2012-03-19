@@ -68,7 +68,7 @@ class KernelDensity(EnsembleStats):
         self.weights = weights
         
         # Default properties of KDE curve
-        self.bound_multiplier = 0.3     # percentage above/below max/min diameters
+        self.bound_multiplier = 0.4     # percentage above/below max/min diameters
         self.smoothing = 1.0            # 'h' factor for smoothing PSD
         self.kerneltype = "Gaussian"    # type of kernel
         self.num_points = 64            # number of points needed for PSD (multiple of 2)

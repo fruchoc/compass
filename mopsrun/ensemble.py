@@ -113,10 +113,3 @@ class Parameter:
     # Return the index of the key
     def getKey(self):
         return self.key
-
-# Enum-like class for diameter types
-class DiamType:
-    col = 1
-    pri = 2
-    sph = 3
-    mob = 4
