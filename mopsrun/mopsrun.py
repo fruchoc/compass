@@ -130,18 +130,12 @@ class MopsRun:
             psd = s.returnPSD()
             meshes.append(psd[0])
             frequencies.append(psd[1])
-<<<<<<< HEAD
             
         psdplot.plotPSDs(meshes, frequencies, names)
     
     # Plots the CIs for all rates
     def plotAllRatesCI(self):
-=======
         
-        psdplot = postproc_plotting.Plotting()
-        psdplot.plotPSDs(meshes, frequencies, names)
-        
->>>>>>> 9bab2d5b3ac42e1bd06aef5267cb105117a46482
         # GET THE RATES PLOT
         ratesplot = postproc_plotting.Plotting()
         
