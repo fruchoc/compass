@@ -150,12 +150,13 @@ class MopsRun:
                 self.allgasphase = trajectory.ChemProfile(fname)
         
         # Allocate diameter types
-        if len(self.ensembles) > 1:
+        if len(self.ensembles) >= 1:
             self.diamtypes = DiamType(self.ensembles[0].getHeaders(), self.allpartproperties.trajectory_names)
         
         # Now let's do some plotting
         self.plotAllPSDs()
-        self.plotAllRatesCI()
+        #self.plotAllRatesCI()
+        self.plotAllChem()
     
     
     # Plots a PSD for every ensemble
@@ -163,7 +164,7 @@ class MopsRun:
         psdplot = postproc_plotting.Plotting()
         
         # Check there are ensembles to plot!
-        if len(self.ensembles) > 1:
+        if len(self.ensembles) >= 1:
             # GET THE PSD PLOTS
             stats = []
             names = []
@@ -201,3 +202,21 @@ class MopsRun:
             runits.append(rate.getUnit())
         
         ratesplot.plotTrajectoryCIs(times, values, rnames, runits)
+    
+        # Plots the CIs for all rates
+    def plotAllChem(self):
+        
+        # GET THE RATES PLOT
+        chemplot = postproc_plotting.Plotting()
+        
+        times = []
+        values = []
+        cnames = []
+        cunits = []
+        for chem in self.allgasphase.trajectories:
+            times.append(chem.getTimes())
+            values.append(chem.getValues())
+            cnames.append(chem.getName())
+            cunits.append(chem.getUnit())
+        
+        chemplot.plotTrajectoryCIs(times, values, cnames, cunits)

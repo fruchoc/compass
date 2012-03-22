@@ -96,13 +96,18 @@ class Plotting:
         for t, v, n in zip(times, values, names):
             lines.append(plt.plot(t, v, linewidth=2.0, label=n))
         
-        plt.legend()
+        plt.legend(loc=0)
+        
+        plt.axes().set_yscale('log')
+        plt.ylabel(units[0])
+        plt.axes().set_xscale('log')
+        plt.xlabel("time, s")
         
         plt.show()
         
     # Checks if there are too many series
     def checkNumSeries(self, names):
-        if len(names) > 5:
+        if len(names) > 7:
             print("compass: too many series!")
             
     

@@ -72,11 +72,6 @@ class TrajectoryContainer:
         # List of trajectory names is empty
         self.trajectory_names = []
         
-        # Initialise the container!
-        self.initialise()
-    
-    # Don't initialise the generic object
-    def initialise(self):
         # Create a new parser for the rates
         parser = mopsparser.ParserTrajectory(self.name)
         
@@ -88,6 +83,13 @@ class TrajectoryContainer:
         
         # Done with parser now
         del parser
+        
+        self.initialise()
+    
+    # Don't initialise the generic object
+    def initialise(self):
+        # Further initialisations for other classes
+        print("compass: trajectory initialised.")
     
     # Add a trajectory to the list
     def addTrajectory(self, new_trajectory):
@@ -112,6 +114,34 @@ class ParticleStats(TrajectoryContainer):
 # Derived class to hold the information on all chemical species
 class ChemProfile(TrajectoryContainer):
     
-    # Dummy function
-    def dummy(self):
-        print "test"
+    # Chem-specific initialisations
+    def initialise(self):
+        
+        # Separate out the T,P,rho
+        self.splitMixtureProperties()
+        
+    
+    # By default, T, P and rho are loaded as chemical species. Split them!
+    def splitMixtureProperties(self):
+        
+        # Get the indices of trajectories.
+        i = 0
+        i_t = -1
+        i_r = -1
+        i_p = -1
+        for name in self.trajectory_names:
+            if (name[0] == 'T'): i_t = i
+            if (name[0] == 'Density'): i_r = i
+            if (name[0] == 'Pressure'): i_p = i
+            i += 1
+        
+        if (i_t < 0 or i_r < 0 or i_p < 0):
+            print("compass: couldn't find indices for T/rho/P!")
+        else:
+            self.pressure_profile = self.trajectories.pop(i_p)
+            self.density_profile = self.trajectories.pop(i_r)
+            self.temp_profile = self.trajectories.pop(i_t)
+            
+            self.trajectory_names.pop(i_p)
+            self.trajectory_names.pop(i_r)
+            self.trajectory_names.pop(i_t)
