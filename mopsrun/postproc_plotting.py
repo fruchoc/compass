@@ -10,6 +10,12 @@ class Plotting:
         # The terminal defines to which format the graphs are written.
         self.terminal = "png"
     
+    # Given an ID 'i', return a particular line style.
+    def getLineStyles(self, i):
+        
+        styles = ['-', '--', '-.', ':']
+        return styles[i % len(styles)]
+    
     # Plots the PSDs given as a list of diameters and ranges
     # Expects the form diameters = [[d1], [d2]] where d1, d2 are lists
     # Doesn't take ensemble objects directly as this allows easier comparison
@@ -30,10 +36,11 @@ class Plotting:
         # List holding lines
         lines = []
         
+        i = 0
         # Plot the curves!
         for d, r, n in zip(diameters, ranges, names):
-            lines.append(plt.plot(d, r, linewidth=2.0, label=n))
-            
+            lines.append(plt.plot(d, r, self.getLineStyles(i), linewidth=2.0, label=n))
+            i += 1
             # Collect some useful data...
             maxima_r.append(max(r))
             minima_r.append(min(r))
@@ -93,8 +100,10 @@ class Plotting:
         self.checkNumSeries(names)
         
         # Plot the curves!
+        i = 0
         for t, v, n in zip(times, values, names):
-            lines.append(plt.plot(t, v, linewidth=2.0, label=n))
+            lines.append(plt.plot(t, v, self.getLineStyles(i), linewidth=2.0, label=n))
+            i += 1
         
         plt.legend(loc=0)
         
@@ -121,4 +130,4 @@ class Plotting:
             else:
                 return True
             i += 1
-    
+
