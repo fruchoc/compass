@@ -128,7 +128,11 @@ class MopsRun:
         if self.hasPsl:
             for fname in self.listPsl:
                 newensemble = ensemble.Ensemble(fname)
-                self.ensembles.append(newensemble)
+                if newensemble.checkIfParticles():
+                    self.ensembles.append(newensemble)
+                else:
+                    print("compass: no particles found in file {0}.".format(fname))
+                    del newensemble
         
         # Now load the particle properties (-part.csv) file
         if self.hasPart:
@@ -146,7 +150,8 @@ class MopsRun:
                 self.allgasphase = trajectory.ChemProfile(fname)
         
         # Allocate diameter types
-        self.diamtypes = DiamType(self.ensembles[0].getHeaders(), self.allpartproperties.trajectory_names)
+        if len(self.ensembles) > 1:
+            self.diamtypes = DiamType(self.ensembles[0].getHeaders(), self.allpartproperties.trajectory_names)
         
         # Now let's do some plotting
         self.plotAllPSDs()
@@ -156,22 +161,28 @@ class MopsRun:
     # Plots a PSD for every ensemble
     def plotAllPSDs(self):
         psdplot = postproc_plotting.Plotting()
-            
-        # GET THE PSD PLOTS
-        stats = []
-        names = []
-        for en in self.ensembles:
-            stats.append(postproc_particles.KernelDensity(en.getParameterList(self.diamtypes.psl_dpri), en.getParameterList(0)))
-            names.append(en.name)
         
-        meshes = []
-        frequencies = []
-        for s in stats:
-            psd = s.returnPSD()
-            meshes.append(psd[0])
-            frequencies.append(psd[1])
+        # Check there are ensembles to plot!
+        if len(self.ensembles) > 1:
+            # GET THE PSD PLOTS
+            stats = []
+            names = []
+            for en in self.ensembles:
+                stats.append(postproc_particles.KernelDensity(en.getParameterList(self.diamtypes.psl_dpri), en.getParameterList(0)))
+                names.append(en.name)
             
-        psdplot.plotPSDs(meshes, frequencies, names)
+            meshes = []
+            frequencies = []
+            for s in stats:
+                psd = s.returnPSD()
+                meshes.append(psd[0])
+                frequencies.append(psd[1])
+                
+            psdplot.plotPSDs(meshes, frequencies, names)
+            
+        else:
+            print("compass: no ensembles found to plot.")
+        
     
     # Plots the CIs for all rates
     def plotAllRatesCI(self):

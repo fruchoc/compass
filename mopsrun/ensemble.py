@@ -37,6 +37,12 @@ class Ensemble:
         
         del psl_parser
         
+    # Check if the PSL actually had any particles...
+    def checkIfParticles(self):
+        if len(self.particles) < 1:
+            return False
+        else:
+            return True
     
     # Gets the keys from the dictionary
     def getKeys(self):
