@@ -5,6 +5,7 @@ import ensemble
 import trajectory
 import postproc_particles
 import postproc_plotting
+import write_csv
 import re
 
 
@@ -156,7 +157,8 @@ class MopsRun:
         # Now let's do some plotting
         self.plotAllPSDs()
         #self.plotAllRatesCI()
-        self.plotAllChem()
+        #self.plotAllChem()
+        
     
     
     # Plots a PSD for every ensemble
@@ -171,6 +173,13 @@ class MopsRun:
             for en in self.ensembles:
                 stats.append(postproc_particles.KernelDensity(en.getParameterList(self.diamtypes.psl_dpri), en.getParameterList(0)))
                 names.append(en.name)
+            
+            psdout = write_csv.CSV_PSD("test.csv")
+            psdout.setPSD(stats[0])
+            psdout.generateHeaders()
+            psdout.generateLines()
+            psdout.writeCSV()
+            psdout.closeCSV()
             
             meshes = []
             frequencies = []
