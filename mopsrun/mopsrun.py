@@ -10,9 +10,7 @@ import re
 
 # Enum-like class for diameter types
 class DiamType:
-    
-    def __init__(self, ensemble, trajectory):
-        
+    def __init__(self, en_headers, trj_headers):
         # Default values
         self.psl_dcol = 2
         self.psl_dmob = 3
@@ -24,35 +22,23 @@ class DiamType:
         self.trj_dsph = 2
         self.trj_dpri = 22
         
+        # Double check headers to ensure proper values are found.
         i = 0
-        while i < len(ensemble):
-            if re.search("Collision Diameter", ensemble[i][0]): self.psl_dcol = i
-            if re.search("Mobility Diameter", ensemble[i][0]): self.psl_dmob = i
-            if re.search("Sphere Diameter", ensemble[i][0]): self.psl_dsph = i
-            if re.search("Primary Diameter", ensemble[i][0]): self.psl_dpri = i
+        while i < len(en_headers):
+            if re.search("Collision Diameter", en_headers[i][0]): self.psl_dcol = i
+            if re.search("Mobility Diameter", en_headers[i][0]): self.psl_dmob = i
+            if re.search("Sphere Diameter", en_headers[i][0]): self.psl_dsph = i
+            if re.search("Primary Diameter", en_headers[i][0]): self.psl_dpri = i
             i += 1
             
         i = 0
-        while i < len(trajectory):
-            if re.search("Collision Diameter", trajectory[i][0]): self.trj_dcol = i
-            if re.search("Mobility Diameter", trajectory[i][0]): self.trj_dmob = i
-            if re.search("Sphere Diameter", trajectory[i][0]): self.trj_dsph = i
-            if (re.search("Diameter", trajectory[i][0]) and re.search("Primary", trajectory[i][0])): self.trj_dpri = i
+        while i < len(trj_headers):
+            if re.search("Collision Diameter", trj_headers[i][0]): self.trj_dcol = i
+            if re.search("Mobility Diameter", trj_headers[i][0]): self.trj_dmob = i
+            if re.search("Sphere Diameter", trj_headers[i][0]): self.trj_dsph = i
+            if (re.search("Diameter", trj_headers[i][0]) and re.search("Primary", trj_headers[i][0])): self.trj_dpri = i
             i += 1
-        
-        self.printKeys()
-    
-    def printKeys(self):
-        print self.psl_dcol
-        print self.psl_dmob
-        print self.psl_dsph
-        print self.psl_dpri
-        
-        print self.trj_dcol
-        print self.trj_dmob
-        print self.trj_dsph
-        print self.trj_dpri
-        
+
 
 # Class which contains all information pertaining to a particular MOPS output run
 class MopsRun:
@@ -163,8 +149,8 @@ class MopsRun:
         self.diamtypes = DiamType(self.ensembles[0].getHeaders(), self.allpartproperties.trajectory_names)
         
         # Now let's do some plotting
-        #self.plotAllPSDs()
-        #self.plotAllRatesCI()
+        self.plotAllPSDs()
+        self.plotAllRatesCI()
     
     
     # Plots a PSD for every ensemble
@@ -175,7 +161,7 @@ class MopsRun:
         stats = []
         names = []
         for en in self.ensembles:
-            stats.append(postproc_particles.KernelDensity(en.getParameterList(2), en.getParameterList(0)))
+            stats.append(postproc_particles.KernelDensity(en.getParameterList(self.diamtypes.psl_dpri), en.getParameterList(0)))
             names.append(en.name)
         
         meshes = []
